@@ -1,0 +1,12 @@
+common:
+  random_state: 42
+  max_iter: 100
+
+kmeans:
+  k: 4
+  initializer: kmeans++        # možnosti: random_uniform | forgy | kmeans++
+
+fuzzy_cmeans:
+  k: 4
+  q: 2.0                       # parametr fuzifikace (pouze FCM)
+  initializer: random_uniform
