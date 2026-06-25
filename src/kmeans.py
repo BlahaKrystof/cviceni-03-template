@@ -26,14 +26,14 @@ class KMeans(IterativeClustering):
         """Přiřadí každý bod k nejbližšímu těžišti (tvrdé přiřazení).
 
         Úkol:
-            1. Vypočítejte matici vzdáleností bod–těžiště pomocí
-               ``self._distances_to_centroids(X, centroids)``.
+            1. Vypočítejte matici vzdáleností bod-těžiště pomocí
+               ``self._distances_to_centroids(x, centroids)``.
             2. Pro každý bod najděte index nejbližšího těžiště pomocí
                ``np.argmin`` podél osy těžišť (``axis=1``).
 
         Parameters
         ----------
-        X:
+        x:
             Příznakový matice tvaru ``(n_bodů, n_příznaků)``.
         centroids:
             Aktuální těžiště tvaru ``(k, n_příznaků)``.
@@ -43,6 +43,7 @@ class KMeans(IterativeClustering):
         np.ndarray
             Tvrdé popisky shluků, tvar ``(n_bodů,)``, hodnoty 0 … k-1.
         """
+        # assert: Ověřte, že x a centroids jsou 2D matice se stejným počtem příznaků
         raise NotImplementedError(
             "Úkol: implementujte KMeans._update_assignment() — použijte "
             "_distances_to_centroids a np.argmin pro tvrdé přiřazení."
@@ -55,14 +56,14 @@ class KMeans(IterativeClustering):
 
         Úkol:
             Pro každý shluk ``c`` v rozsahu 0 … k-1:
-            1. Vyberte řádky ``X``, kde ``assignment == c``.
+            1. Vyberte řádky ``x``, kde ``assignment == c``.
             2. Spočítejte průměr ``np.mean(..., axis=0)``.
             3. Pokud je shluk prázdný (žádný bod nepatří do ``c``), zachovejte
                staré těžiště ``self.centroids_[c]`` — zabraňuje NaN.
 
         Parameters
         ----------
-        X:
+        x:
             Příznakový matice tvaru ``(n_bodů, n_příznaků)``.
         assignment:
             Tvrdé popisky z ``_update_assignment``, tvar ``(n_bodů,)``.
@@ -72,6 +73,7 @@ class KMeans(IterativeClustering):
         np.ndarray
             Nová těžiště tvaru ``(k, n_příznaků)``.
         """
+        # assert: Ověřte, že assignment je 1D pole a jeho délka odpovídá počtu bodů v x
         raise NotImplementedError(
             "Úkol: implementujte KMeans._update_centroids() — průměr bodů "
             "přiřazených ke každému shluku. Ošetřete prázdné shluky."
@@ -94,6 +96,7 @@ class KMeans(IterativeClustering):
         RuntimeError
             Pokud ``fit`` nebyl dosud volán.
         """
+        # assert: Ověřte, že fit() byl zavolán (self.assignment_ není None)
         raise NotImplementedError(
             "Úkol: implementujte KMeans.predict() — vraťte self.assignment_ "
             "(tvrdé popisky uložené metodou fit)."

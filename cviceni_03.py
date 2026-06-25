@@ -1,11 +1,21 @@
+# -*- coding: utf-8 -*-
+
 """
-Hlavní pipeline Cvičení 03 — nehierarchické shlukování.
+Created on 25. 06. 2026
 
-Spusťte tento soubor přímo:
-    python cviceni_03.py
+Author: Richard Redina
+Email: 195715@vut.cz
+Affiliation:
+         International Clinical Research Center, Brno
+         Brno University of Technology, Brno
+GitHub: RicRedi
 
-Dokud jsou části kódu nedokončené, program vypíše srozumitelnou zprávu
-a pokračuje dál — takže víte, jak daleko jste se dostali.
+(._.)
+ <|>
+_/|_
+
+Description:
+    Cvičení 03 Umělá inteligence v medicíně — Nehierarchické shlukování
 """
 
 from __future__ import annotations
@@ -24,14 +34,25 @@ def _ni(name: str, exc: NotImplementedError) -> None:
 # Načtení konfigurace
 # ---------------------------------------------------------------------------
 try:
-    from dataio.config_manager import load_config, make_initializer
-    from dataio.loader import load_image
-    from dataio.features import to_hsv, select_channels
-    from dataio.plotting import plot_segmentation, plot_silhouette, plot_k_selection
-    from src.distance import EuclideanDistance
-    from src.kmeans import KMeans
-    from src.fuzzy_cmeans import FuzzyCMeans
-    from src.silhouette import silhouette_samples, silhouette_score
+    from dataio import (
+        load_config,
+        make_initializer,
+        load_image,
+        to_hsv,
+        select_channels,
+        plot_segmentation,
+        plot_silhouette,
+        plot_k_selection,
+    )
+
+    from src import (
+        EuclideanDistance,
+        KMeans,
+        FuzzyCMeans,
+        silhouette_samples,
+        silhouette_score
+    )
+
 except ImportError as e:
     print(f"Chyba importu: {e}")
     sys.exit(1)
@@ -44,11 +65,11 @@ print("=" * 60)
 # 1. Konfigurace
 # ---------------------------------------------------------------------------
 cfg = load_config("config.yaml")
-common = cfg["common"]
-km_cfg = cfg["kmeans"]
-fcm_cfg = cfg["fuzzy_cmeans"]
+common = cfg.common
+km_cfg = cfg.kmeans
+fcm_cfg = cfg.fuzzy_cmeans
 
-print(f"\nKonfigurace načtena: k-means k={km_cfg['k']}, FCM k={fcm_cfg['k']}, q={fcm_cfg['q']}")
+print(f"\nKonfigurace načtena: k-means k={km_cfg.k}, FCM k={fcm_cfg.k}, q={fcm_cfg.q}")
 
 # ---------------------------------------------------------------------------
 # 2. Načtení dat
@@ -71,17 +92,17 @@ dist = EuclideanDistance()
 # ---------------------------------------------------------------------------
 print("\n--- K-means ---")
 try:
-    km_initializer = make_initializer(km_cfg["initializer"], common["random_state"])
+    km_initializer = make_initializer(km_cfg.initializer, common.random_state)
     km = KMeans(
-        k=km_cfg["k"],
+        k=km_cfg.k,
         distance=dist,
         initializer=km_initializer,
-        max_iter=common["max_iter"],
+        max_iter=common.max_iter,
     )
     km.fit(rgb_data)
     km_labels = km.predict()
-    print(f"K-means dokončen. Počet shluků: {km_cfg['k']}")
-    plot_segmentation(km_labels, dimensions, km_cfg["k"], title=f"K-means (k={km_cfg['k']})")
+    print(f"K-means dokončen. Počet shluků: {km_cfg.k}")
+    plot_segmentation(km_labels, dimensions, km_cfg.k, title=f"K-means (k={km_cfg.k})")
 except NotImplementedError as e:
     _ni("K-means fit/predict", e)
     km_labels = None
@@ -101,19 +122,19 @@ if km_labels is not None:
 # ---------------------------------------------------------------------------
 print("\n--- Fuzzy c-means ---")
 try:
-    fcm_initializer = make_initializer(fcm_cfg["initializer"], common["random_state"])
+    fcm_initializer = make_initializer(fcm_cfg.initializer, common.random_state)
     fcm = FuzzyCMeans(
-        k=fcm_cfg["k"],
+        k=fcm_cfg.k,
         distance=dist,
         initializer=fcm_initializer,
-        q=fcm_cfg["q"],
-        max_iter=common["max_iter"],
+        q=fcm_cfg.q,
+        max_iter=common.max_iter,
     )
     fcm.fit(rgb_data)
     fcm_labels = fcm.predict()
-    print(f"FCM dokončen. Počet shluků: {fcm_cfg['k']}, q={fcm_cfg['q']}")
-    plot_segmentation(fcm_labels, dimensions, fcm_cfg["k"],
-                      title=f"Fuzzy c-means (k={fcm_cfg['k']}, q={fcm_cfg['q']})")
+    print(f"FCM dokončen. Počet shluků: {fcm_cfg.k}, q={fcm_cfg.q}")
+    plot_segmentation(fcm_labels, dimensions, fcm_cfg.k,
+                      title=f"Fuzzy c-means (k={fcm_cfg.k}, q={fcm_cfg.q})")
 except NotImplementedError as e:
     _ni("FuzzyCMeans fit/predict", e)
     fcm_labels = None
@@ -134,12 +155,12 @@ if fcm_labels is not None:
 print("\n--- Experiment: srovnání inicializačních strategií ---")
 for init_name in ["random_uniform", "forgy", "kmeans++"]:
     try:
-        init = make_initializer(init_name, common["random_state"])
+        init = make_initializer(init_name, common.random_state)
         model = KMeans(
-            k=km_cfg["k"],
+            k=km_cfg.k,
             distance=dist,
             initializer=init,
-            max_iter=common["max_iter"],
+            max_iter=common.max_iter,
         )
         model.fit(rgb_data)
         labels = model.predict()
@@ -163,12 +184,12 @@ channel_configs = {
 for ch_name, channels in channel_configs.items():
     try:
         subset = select_channels(rgb_data, channels)
-        init = make_initializer("random_uniform", common["random_state"])
+        init = make_initializer("random_uniform", common.random_state)
         model = KMeans(
-            k=km_cfg["k"],
+            k=km_cfg.k,
             distance=dist,
             initializer=init,
-            max_iter=common["max_iter"],
+            max_iter=common.max_iter,
         )
         model.fit(subset)
         labels = model.predict()
@@ -186,16 +207,16 @@ for ch_name, channels in channel_configs.items():
 print("\n--- Experiment: HSV prostor ---")
 try:
     hsv_data = to_hsv(rgb_data)
-    init = make_initializer("random_uniform", common["random_state"])
+    init = make_initializer("random_uniform", common.random_state)
     model = KMeans(
-        k=km_cfg["k"],
+        k=km_cfg.k,
         distance=dist,
         initializer=init,
-        max_iter=common["max_iter"],
+        max_iter=common.max_iter,
     )
     model.fit(hsv_data)
     hsv_labels = model.predict()
-    plot_segmentation(hsv_labels, dimensions, km_cfg["k"], title="K-means v prostoru HSV")
+    plot_segmentation(hsv_labels, dimensions, km_cfg.k, title="K-means v prostoru HSV")
     try:
         score = silhouette_score(hsv_data, hsv_labels, dist)
         print(f"  HSV prostor: silhouetové skóre = {score:.4f}")
@@ -214,12 +235,12 @@ k_valid: list[int] = []
 
 for k_val in k_range:
     try:
-        init = make_initializer("random_uniform", common["random_state"])
+        init = make_initializer("random_uniform", common.random_state)
         model = KMeans(
             k=k_val,
             distance=dist,
             initializer=init,
-            max_iter=common["max_iter"],
+            max_iter=common.max_iter,
         )
         model.fit(rgb_data)
         labels = model.predict()

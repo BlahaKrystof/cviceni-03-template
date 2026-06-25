@@ -51,7 +51,7 @@ def silhouette_samples(
 
     Parameters
     ----------
-    X:
+    x:
         Příznakový matice tvaru ``(n_bodů, n_příznaků)``.
     labels:
         Tvrdé popisky shluků, tvar ``(n_bodů,)``, hodnoty 0 … k-1.
@@ -64,6 +64,8 @@ def silhouette_samples(
         Silhouetové hodnoty, tvar ``(n_bodů,)``, hodnoty v [-1, 1].
         Vyšší hodnota znamená lepší zařazení bodu do shluku.
     """
+    # assert: Ověřte, že x je 2D matice, labels je 1D pole stejné délky
+    # a obsahuje alespoň 2 různé shluky
     raise NotImplementedError(
         "Úkol: implementujte silhouette_samples() — vypočítejte silhouetovou "
         "hodnotu s(i) = (b(i) - a(i)) / max(a(i), b(i)) pro každý bod."
@@ -84,7 +86,7 @@ def silhouette_score(
 
     Parameters
     ----------
-    X:
+    x:
         Příznakový matice tvaru ``(n_bodů, n_příznaků)``.
     labels:
         Tvrdé popisky shluků, tvar ``(n_bodů,)``.

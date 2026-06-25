@@ -6,8 +6,6 @@ se shlukování nerozjede. Toto je záměrná kontinuita: stejná třída ``Dist
 propojuje Cvičení 01, 02 a 03.
 """
 
-from __future__ import annotations
-
 from abc import ABC, abstractmethod
 
 import numpy as np
@@ -45,6 +43,7 @@ class Distance(ABC):
         float
             Vzdálenost mezi ``point_a`` a ``point_b``.
         """
+        # assert: Ověřte, že oba vstupy jsou 1D vektory stejné délky
         raise NotImplementedError(
             "Úkol: implementujte calculate() — zkopírujte řešení z Cvičení 01."
         )
@@ -66,6 +65,7 @@ class Distance(ABC):
         np.ndarray
             Matice vzdáleností tvaru ``(n_bodů, n_bodů)``.
         """
+        # assert: Ověřte, že data jsou 2D matice s alespoň 2 body
         n: int = data.shape[0]
         matrix: np.ndarray = np.zeros((n, n), dtype=float)
         for i in range(n):
@@ -103,6 +103,7 @@ class EuclideanDistance(Distance):
         float
             Euklidovská vzdálenost.
         """
+        # assert: Ověřte, že oba vstupy jsou 1D vektory stejné délky
         raise NotImplementedError(
             "Úkol: implementujte EuclideanDistance.calculate() — zkopírujte z Cvičení 01."
         )
@@ -135,13 +136,14 @@ class ManhattanDistance(Distance):
         float
             Manhattanská vzdálenost.
         """
+        # assert: Ověřte, že oba vstupy jsou 1D vektory stejné délky
         raise NotImplementedError(
             "Úkol: implementujte ManhattanDistance.calculate() — zkopírujte z Cvičení 01."
         )
 
 
 class CosineCoeficient(Distance):
-    """Kosinová podobnost (jako vzdálenost: 1 − kosinová_podobnost)."""
+    """Kosinová podobnost (jako vzdálenost: 1 - kosinová_podobnost)."""
 
     @property
     def is_metric(self) -> bool:
@@ -168,6 +170,7 @@ class CosineCoeficient(Distance):
         float
             Kosinová vzdálenost v rozsahu [0, 2].
         """
+        # assert: Ověřte, že oba vstupy jsou 1D vektory stejné délky
         raise NotImplementedError(
             "Úkol: implementujte CosineCoeficient.calculate() — zkopírujte z Cvičení 01."
         )

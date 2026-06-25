@@ -96,6 +96,7 @@ class RandomUniformInit(Initializer):
         np.ndarray
             Těžiště tvaru ``(k, n_příznaků)`` — hodnoty v rozsahu sloupců ``x``.
         """
+        # assert: Ověřte, že x je 2D matice, k >= 2 a k nepřekračuje počet bodů
         raise NotImplementedError(
             "Úkol: implementujte RandomUniformInit.initialize() \
             vygenerujte k těžišť náhodně z rovnoměrného rozdělení v rozsahu dat."
@@ -129,6 +130,8 @@ class ForgyInit(Initializer):
         np.ndarray
             Těžiště tvaru ``(k, n_příznaků)`` — podmnožina řádků ``x``.
         """
+        # assert: Ověřte, že x je 2D matice, k >= 2 a k nepřekračuje počet bodů
+        # (nelze vybrat více různých bodů než jich existuje)
         raise NotImplementedError(
             "Úkol: implementujte ForgyInit.initialize() — vyberte k různých "
             "existujících bodů z x jako počáteční těžiště."
@@ -172,6 +175,7 @@ class KMeansPlusPlusInit(Initializer):
         np.ndarray
             Těžiště tvaru ``(k, n_příznaků)`` vybraná algoritmem k-means++.
         """
+        # assert: Ověřte, že x je 2D matice, k >= 2 a k nepřekračuje počet bodů
         raise NotImplementedError(
             "Úkol: implementujte KMeansPlusPlusInit.initialize() — algoritmus k-means++. "
             "Viz docstring pro popis kroků algoritmu."

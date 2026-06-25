@@ -1,25 +1,58 @@
 """
 Správa konfigurace experimentů ze souboru YAML a továrna inicializátorů.
 
-Konfigurace je načtena do slovníku a **rozbalena v pipeline** do pojmenovaných
-argumentů konstruktorů — modely nikdy nevidí slovník ani YAML.
+Konfigurace je načtena do typovaných dataclass instancí — překlep v názvu
+atributu odhalí editor okamžitě, ne až za běhu.
 """
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from dataclasses import dataclass
 
 import yaml
 
-if TYPE_CHECKING:
-    from src.initialization import Initializer
+from src import Initializer
 
 
-def load_config(filepath: str = "config.yaml") -> dict:
+@dataclass
+class CommonConfig:
+    """Společná nastavení sdílená oběma algoritmy."""
+
+    random_state: int
+    max_iter: int
+
+
+@dataclass
+class KMeansConfig:
+    """Nastavení specifická pro algoritmus k-means."""
+
+    k: int
+    initializer: str
+
+
+@dataclass
+class FuzzyCMeansConfig:
+    """Nastavení specifická pro fuzzy c-means."""
+
+    k: int
+    q: float
+    initializer: str
+
+
+@dataclass
+class ExperimentConfig:
+    """Kompletní konfigurace experimentu načtená z YAML souboru."""
+
+    common: CommonConfig
+    kmeans: KMeansConfig
+    fuzzy_cmeans: FuzzyCMeansConfig
+
+
+def load_config(filepath: str = "config.yaml") -> ExperimentConfig:
     """Načte konfiguraci experimentu ze souboru YAML.
 
-    Vrácený slovník má tři klíče: ``common``, ``kmeans`` a ``fuzzy_cmeans``.
-    Pipeline z nich rozbalí pojmenované argumenty pro konstruktory.
+    Vrací typovanou instanci ``ExperimentConfig`` — přístup přes atributy
+    (``cfg.kmeans.k``) místo slovníkových klíčů (``cfg["kmeans"]["k"]``).
 
     Parameters
     ----------
@@ -28,14 +61,20 @@ def load_config(filepath: str = "config.yaml") -> dict:
 
     Returns
     -------
-    dict
-        Vnořený slovník s konfigurací experimentu.
+    ExperimentConfig
+        Typovaná konfigurace experimentu.
     """
     with open(filepath, "r", encoding="utf-8") as f:
-        return yaml.safe_load(f)
+        raw: dict = yaml.safe_load(f)
+
+    return ExperimentConfig(
+        common=CommonConfig(**raw["common"]),
+        kmeans=KMeansConfig(**raw["kmeans"]),
+        fuzzy_cmeans=FuzzyCMeansConfig(**raw["fuzzy_cmeans"]),
+    )
 
 
-def make_initializer(name: str, random_state: int | None = None) -> "Initializer":
+def make_initializer(name: str, random_state: int | None = None) -> Initializer:
     """Továrna: převede jméno strategie inicializace na instanci ``Initializer``.
 
     Úkol:
@@ -79,14 +118,14 @@ def make_initializer(name: str, random_state: int | None = None) -> "Initializer
     )
 
 
-def validate_config(cfg: dict) -> None:
+def validate_config(cfg: ExperimentConfig) -> None:
     """Ověří základní platnost konfigurace a vyvolá výjimku při chybě.
 
     Úkol (volitelný):
         Přidejte ověření, že konfigurace obsahuje požadované hodnoty
         ve správných rozsazích:
         - ``k >= 2`` (shlukování s méně než dvěma shluky nedává smysl)
-        - ``m > 1``  (parametr fuzifikace musí být větší než 1)
+        - ``q > 1``  (parametr fuzifikace musí být větší než 1)
         - ``initializer`` je jedním z povolených názvů
 
         Používejte ``assert`` nebo ``ValueError`` pro srozumitelné chybové zprávy.
@@ -94,9 +133,9 @@ def validate_config(cfg: dict) -> None:
     Parameters
     ----------
     cfg:
-        Slovník načtený funkcí ``load_config``.
+        Typovaná konfigurace načtená funkcí ``load_config``.
     """
     raise NotImplementedError(
         "Úkol (volitelný): implementujte validate_config — ověřte platnost "
-        "konfiguračního slovníku (k >= 2, q > 1, platný název inicializátoru)."
+        "konfigurace (k >= 2, q > 1, platný název inicializátoru)."
     )

@@ -8,13 +8,16 @@ dva variační body (přiřazení a přepočet těžišť) implementují podtř�
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+
 from typing import TYPE_CHECKING
 
 import numpy as np
 
 if TYPE_CHECKING:
-    from src.distance import Distance
-    from src.initialization import Initializer
+    from src import (
+        Distance,
+        Initializer,
+    )
 
 
 class IterativeClustering(ABC):
@@ -61,7 +64,7 @@ class IterativeClustering(ABC):
     def _distances_to_centroids(
         self, x: np.ndarray, centroids: np.ndarray
     ) -> np.ndarray:
-        """Vypočítá obdélníkovou matici vzdáleností bod–těžiště.
+        """Vypočítá obdélníkovou matici vzdáleností bod-těžiště.
 
         Úkol:
             Implementujte výpočet matice vzdáleností tvaru ``(n_bodů, k)``,
@@ -71,8 +74,8 @@ class IterativeClustering(ABC):
 
             Zamyslete se: v čem se tato matice liší od ``create_distance_matrix``
             z Cvičení 02?
-            → Zde je matice **obdélníková** (m × k): body vs. těžiště.
-            → V Cvičení 02 byla matice **čtvercová** (n × n): body vs. body.
+            → Zde je matice **obdélníková** (m x k): body vs. těžiště.
+            → V Cvičení 02 byla matice **čtvercová** (n x n): body vs. body.
             Tato asymetrie odráží podstatu iterativního shlukování — těžiště
             nejsou body datasetu (kromě Forgyho inicializace).
 
@@ -88,13 +91,17 @@ class IterativeClustering(ABC):
         np.ndarray
             Matice vzdáleností tvaru ``(n_bodů, k)``.
         """
+        # assert: Ověřte, že x a centroids jsou 2D matice se stejným počtem příznaků
+        # a centroids má self.k řádků
         raise NotImplementedError(
             "Úkol: implementujte _distances_to_centroids() — vytvořte matici "
             "vzdáleností tvaru (n_bodů, k) voláním self.distance.calculate."
         )
 
     def _has_converged(
-        self, old_centroids: np.ndarray, new_centroids: np.ndarray
+        self,
+        old_centroids: np.ndarray,
+        new_centroids: np.ndarray,
     ) -> bool:
         """Zkontroluje, zda se těžiště přestala pohybovat (konvergence).
 
@@ -122,12 +129,13 @@ class IterativeClustering(ABC):
         bool
             ``True`` pokud algoritmus konvergoval, jinak ``False``.
         """
+        # assert: Ověřte, že obě matice těžišť mají stejný tvar
         raise NotImplementedError(
             "Úkol: implementujte _has_converged() — porovnejte posun těžišť "
             "s prahem self._EPSILON pomocí np.linalg.norm."
         )
 
-    def fit(self, x: np.ndarray) -> "IterativeClustering":
+    def fit(self, x: np.ndarray) -> IterativeClustering:
         """Natrénuje shlukování na datech iterativní optimalizací.
 
         Úkol:
@@ -145,14 +153,14 @@ class IterativeClustering(ABC):
                   ``old_centroids = self.centroids_.copy()``
 
                c. Přepočítejte těžiště z nového přiřazení (variační bod):
-                  ``new_centroids = self._update_centroids(X, assignment)``
+                  ``new_centroids = self._update_centroids(x, assignment)``
 
                d. Uložte výsledky a zkontrolujte konvergenci:
                   ``self.assignment_ = assignment``
                   ``self.centroids_ = new_centroids``
                   Pokud ``self._has_converged(old_centroids, new_centroids)``: break
 
-            3. Vraťte ``self`` (umožňuje řetězení ``fit(X).predict()``).
+            3. Vraťte ``self`` (umožňuje řetězení ``fit(x).predict()``).
 
             Pořadí operací je závazné:
             Přiřazení se počítá ze *starých* těžišť, nová těžiště z *nového*
@@ -166,7 +174,7 @@ class IterativeClustering(ABC):
 
         Parameters
         ----------
-        X:
+        x:
             Příznakový matice tvaru ``(n_bodů, n_příznaků)``.
 
         Returns
@@ -174,6 +182,7 @@ class IterativeClustering(ABC):
         IterativeClustering
             Instance ``self`` po natrénování (pro řetězení metod).
         """
+        # assert: Ověřte, že x je 2D matice a obsahuje alespoň k bodů
         raise NotImplementedError(
             "Úkol: implementujte fit() — iterační smyčku inicializace → přiřazení "
             "→ přepočet těžišť → konvergence. Viz docstring pro pořadí kroků."
@@ -190,7 +199,7 @@ class IterativeClustering(ABC):
 
         Parameters
         ----------
-        X:
+        x:
             Příznakový matice tvaru ``(n_bodů, n_příznaků)``.
         centroids:
             Aktuální těžiště tvaru ``(k, n_příznaků)``.
@@ -209,7 +218,7 @@ class IterativeClustering(ABC):
 
         Parameters
         ----------
-        X:
+        x:
             Příznakový matice tvaru ``(n_bodů, n_příznaků)``.
         assignment:
             Aktuální přiřazení (tvrdé popisky nebo matice členství).

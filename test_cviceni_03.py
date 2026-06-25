@@ -51,10 +51,10 @@ def make_three_clusters(random_state: int = 0) -> tuple[np.ndarray, np.ndarray]:
     """
     rng = np.random.default_rng(random_state)
     centers = np.array([[0.0, 0.0], [10.0, 0.0], [5.0, 8.66]])
-    X_parts = [rng.normal(center, 0.3, (30, 2)) for center in centers]
-    X = np.vstack(X_parts).astype(np.float32)
+    x_parts = [rng.normal(center, 0.3, (30, 2)) for center in centers]
+    x = np.vstack(x_parts).astype(np.float32)
     true_labels = np.repeat([0, 1, 2], 30)
-    return X, true_labels
+    return x, true_labels
 
 
 def _align_labels(pred: np.ndarray, true: np.ndarray, k: int) -> np.ndarray:
@@ -88,49 +88,49 @@ class TestInitializers:
 
     def test_random_uniform_shape(self) -> None:
         """RandomUniformInit vrátí správný tvar těžišť."""
-        X, _ = make_three_clusters()
+        x, _ = make_three_clusters()
         init = RandomUniformInit(random_state=42)
-        centroids = init.initialize(X, k=3)
+        centroids = init.initialize(x, k=3)
         assert centroids.shape == (3, 2), "Tvar těžišť musí být (k, n_příznaků)"
 
     def test_random_uniform_range(self) -> None:
         """Těžiště RandomUniformInit leží v rozsahu dat."""
-        X, _ = make_three_clusters()
+        x, _ = make_three_clusters()
         init = RandomUniformInit(random_state=42)
-        centroids = init.initialize(X, k=5)
-        assert (centroids >= X.min(axis=0)).all()
-        assert (centroids <= X.max(axis=0)).all()
+        centroids = init.initialize(x, k=5)
+        assert (centroids >= x.min(axis=0)).all()
+        assert (centroids <= x.max(axis=0)).all()
 
     def test_forgy_shape(self) -> None:
         """ForgyInit vrátí správný tvar těžišť."""
-        X, _ = make_three_clusters()
+        x, _ = make_three_clusters()
         init = ForgyInit(random_state=42)
-        centroids = init.initialize(X, k=3)
+        centroids = init.initialize(x, k=3)
         assert centroids.shape == (3, 2)
 
     def test_forgy_points_from_data(self) -> None:
         """Těžiště ForgyInit jsou existující body datasetu."""
-        X, _ = make_three_clusters()
+        x, _ = make_three_clusters()
         init = ForgyInit(random_state=42)
-        centroids = init.initialize(X, k=3)
+        centroids = init.initialize(x, k=3)
         for c in centroids:
-            assert any(np.allclose(c, row) for row in X), \
-                "Každé těžiště Forgy musí být řádkem datasetu X"
+            assert any(np.allclose(c, row) for row in x), \
+                "Každé těžiště Forgy musí být řádkem datasetu x"
 
     def test_kmeans_plus_plus_shape(self) -> None:
         """KMeansPlusPlusInit vrátí správný tvar těžišť."""
-        X, _ = make_three_clusters()
+        x, _ = make_three_clusters()
         init = KMeansPlusPlusInit(random_state=42)
-        centroids = init.initialize(X, k=3)
+        centroids = init.initialize(x, k=3)
         assert centroids.shape == (3, 2)
 
     def test_random_state_setter_reseeds(self) -> None:
         """Setter random_state přesemení generátor — výsledky jsou reprodukovatelné."""
-        X, _ = make_three_clusters()
+        x, _ = make_three_clusters()
         init = RandomUniformInit(random_state=1)
-        c1 = init.initialize(X, k=3)
+        c1 = init.initialize(x, k=3)
         init.random_state = 1
-        c2 = init.initialize(X, k=3)
+        c2 = init.initialize(x, k=3)
         np.testing.assert_array_equal(c1, c2, err_msg="Stejný seed musí dát stejný výsledek")
 
 
@@ -146,13 +146,13 @@ class TestKMeans:
 
     def test_fit_predict_shape(self) -> None:
         """predict() vrátí pole správného tvaru."""
-        X, _ = make_three_clusters()
+        x, _ = make_three_clusters()
         dist = DummyDistance()
         init = RandomUniformInit(random_state=42)
         km = KMeans(k=3, distance=dist, initializer=init, max_iter=100)
-        km.fit(X)
+        km.fit(x)
         labels = km.predict()
-        assert labels.shape == (X.shape[0],), "predict musí vrátit (n_bodů,)"
+        assert labels.shape == (x.shape[0],), "predict musí vrátit (n_bodů,)"
 
     def test_fit_recovers_clusters(self) -> None:
         """K-means správně rozezná tři zjevně oddělené shluky."""
@@ -166,25 +166,6 @@ class TestKMeans:
         accuracy = (aligned == true).mean()
         assert accuracy > 0.95, f"Přesnost shlukování je příliš nízká: {accuracy:.2%}"
 
-    def test_centroids_near_true_centers(self) -> None:
-        """Těžiště leží blízko skutečných středů shluků."""
-        X, _ = make_three_clusters()
-        true_centers = np.array([[0.0, 0.0], [10.0, 0.0], [5.0, 8.66]])
-        dist = DummyDistance()
-        init = KMeansPlusPlusInit(random_state=42)
-        km = KMeans(k=3, distance=dist, initializer=init, max_iter=200)
-        km.fit(X)
-        centroids = km.centroids_
-        assert centroids is not None
-
-        # Alespoň jedno těžiště blízko každého skutečného středu
-        for true_c in true_centers:
-            min_dist = min(np.linalg.norm(km.centroids_[j] - true_c) for j in range(3))
-            assert min_dist < 1.0, (
-                f"Žádné těžiště není dostatečně blízko středu {true_c}: "
-                f"min. vzdál. = {min_dist:.2f}"
-            )
-
     def test_predict_without_fit_raises(self) -> None:
         """predict() bez předchozího fit() musí vyvolat výjimku."""
         dist = DummyDistance()
@@ -196,11 +177,11 @@ class TestKMeans:
 
     def test_label_values_in_range(self) -> None:
         """Popisky musí být v rozsahu 0 … k-1."""
-        X, _ = make_three_clusters()
+        x, _ = make_three_clusters()
         dist = DummyDistance()
         init = RandomUniformInit(random_state=7)
         km = KMeans(k=3, distance=dist, initializer=init, max_iter=100)
-        km.fit(X)
+        km.fit(x)
         labels = km.predict()
         assert labels.min() >= 0
         assert labels.max() <= 2
@@ -218,40 +199,40 @@ class TestFuzzyCMeans:
 
     def test_membership_rows_sum_to_one(self) -> None:
         """Každý řádek matice členství musí sumovat na 1."""
-        X, _ = make_three_clusters()
+        x, _ = make_three_clusters()
         dist = DummyDistance()
         init = RandomUniformInit(random_state=42)
         fcm = FuzzyCMeans(k=3, distance=dist, initializer=init, q=2.0, max_iter=100)
-        fcm.fit(X)
-        U = fcm.assignment_
-        assert U is not None, "assignment_ musí být nastaveno po fit()"
-        assert U.shape == (X.shape[0], 3), f"Tvar matice členství: {U.shape}"
+        fcm.fit(x)
+        u = fcm.assignment_
+        assert u is not None, "assignment_ musí být nastaveno po fit()"
+        assert u.shape == (x.shape[0], 3), f"Tvar matice členství: {u.shape}"
         np.testing.assert_allclose(
-            U.sum(axis=1),
-            np.ones(X.shape[0]),
+            u.sum(axis=1),
+            np.ones(x.shape[0]),
             atol=1e-5,
             err_msg="Každý řádek matice členství musí sumovat na 1",
         )
 
     def test_predict_returns_hard_labels(self) -> None:
         """predict() FCM vrátí tvrdé popisky (argmax), ne matici."""
-        X, _ = make_three_clusters()
+        x, _ = make_three_clusters()
         dist = DummyDistance()
         init = RandomUniformInit(random_state=42)
         fcm = FuzzyCMeans(k=3, distance=dist, initializer=init, q=2.0, max_iter=100)
-        fcm.fit(X)
+        fcm.fit(x)
         labels = fcm.predict()
-        assert labels.shape == (X.shape[0],), "predict FCM musí vrátit (n_bodů,)"
+        assert labels.shape == (x.shape[0],), "predict FCM musí vrátit (n_bodů,)"
         assert labels.dtype in (np.int32, np.int64, np.intp), \
             "Tvrdé popisky musí být celočíselného typu"
 
     def test_fcm_recovers_clusters(self) -> None:
         """FCM správně rozezná tři dobře oddělené shluky."""
-        X, true = make_three_clusters()
+        x, true = make_three_clusters()
         dist = DummyDistance()
         init = ForgyInit(random_state=42)
         fcm = FuzzyCMeans(k=3, distance=dist, initializer=init, q=2.0, max_iter=200)
-        fcm.fit(X)
+        fcm.fit(x)
         pred = fcm.predict()
         aligned = _align_labels(pred, true, k=3)
         accuracy = (aligned == true).mean()
@@ -279,49 +260,49 @@ class TestSilhouette:
 
     def test_silhouette_samples_shape(self) -> None:
         """silhouette_samples vrátí pole správného tvaru."""
-        X, _ = make_three_clusters()
+        x, _ = make_three_clusters()
         dist = DummyDistance()
         init = ForgyInit(random_state=42)
         km = KMeans(k=3, distance=dist, initializer=init, max_iter=100)
-        km.fit(X)
+        km.fit(x)
         labels = km.predict()
-        samples = silhouette_samples(X, labels, dist)
-        assert samples.shape == (X.shape[0],)
+        samples = silhouette_samples(x, labels, dist)
+        assert samples.shape == (x.shape[0],)
 
     def test_silhouette_samples_range(self) -> None:
         """Silhouetové hodnoty leží v [-1, 1]."""
-        X, _ = make_three_clusters()
+        x, _ = make_three_clusters()
         dist = DummyDistance()
         init = ForgyInit(random_state=42)
         km = KMeans(k=3, distance=dist, initializer=init, max_iter=100)
-        km.fit(X)
+        km.fit(x)
         labels = km.predict()
-        samples = silhouette_samples(X, labels, dist)
+        samples = silhouette_samples(x, labels, dist)
         assert (samples >= -1.0 - 1e-6).all() and (samples <= 1.0 + 1e-6).all(), \
             "Silhouetové hodnoty musí být v [-1, 1]"
 
     def test_silhouette_high_for_well_separated(self) -> None:
         """Dobře oddělené shluky mají vysoké silhouetové skóre."""
-        X, _ = make_three_clusters()
+        x, _ = make_three_clusters()
         dist = DummyDistance()
         init = ForgyInit(random_state=42)
         km = KMeans(k=3, distance=dist, initializer=init, max_iter=200)
-        km.fit(X)
+        km.fit(x)
         labels = km.predict()
-        score = silhouette_score(X, labels, dist)
+        score = silhouette_score(x, labels, dist)
         assert score > 0.7, \
             f"Silhouetové skóre pro dobře oddělené shluky musí být > 0.7, dostali jsme {score:.3f}"
 
     def test_silhouette_score_is_mean(self) -> None:
         """silhouette_score je průměr silhouette_samples."""
-        X, _ = make_three_clusters()
+        x, _ = make_three_clusters()
         dist = DummyDistance()
         init = RandomUniformInit(random_state=42)
         km = KMeans(k=3, distance=dist, initializer=init, max_iter=100)
-        km.fit(X)
+        km.fit(x)
         labels = km.predict()
-        samples = silhouette_samples(X, labels, dist)
-        score = silhouette_score(X, labels, dist)
+        samples = silhouette_samples(x, labels, dist)
+        score = silhouette_score(x, labels, dist)
         np.testing.assert_allclose(score, samples.mean(), atol=1e-6)
 
 

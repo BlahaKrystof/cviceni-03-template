@@ -9,9 +9,11 @@ from __future__ import annotations
 
 import numpy as np
 
-from src.base import IterativeClustering
-from src.distance import Distance
-from src.initialization import Initializer
+from src import (
+    IterativeClustering,
+    Distance,
+    Initializer,
+    )
 
 
 class FuzzyCMeans(IterativeClustering):
@@ -50,6 +52,7 @@ class FuzzyCMeans(IterativeClustering):
         max_iter:
             Maximální počet iterací.
         """
+        # assert: Ověřte, že parametr fuzifikace q je větší než 1
         super().__init__(k, distance, initializer, max_iter)
         self.q: float = q
 
@@ -90,6 +93,7 @@ class FuzzyCMeans(IterativeClustering):
         np.ndarray
             Matice členství tvaru ``(n_bodů, k)``, každý řádek sumuje na 1.
         """
+        # assert: Ověřte, že x a centroids jsou 2D matice se stejným počtem příznaků
         raise NotImplementedError(
             "Úkol: implementujte FuzzyCMeans._update_assignment() — matici "
             "členství FCM. Viz docstring pro vzorec a ošetření dělení nulou."
@@ -125,6 +129,7 @@ class FuzzyCMeans(IterativeClustering):
         np.ndarray
             Nová těžiště tvaru ``(k, n_příznaků)``.
         """
+        # assert: Ověřte, že assignment (matice členství U) je 2D pole tvaru (n_bodů, k)
         raise NotImplementedError(
             "Úkol: implementujte FuzzyCMeans._update_centroids() — vážený průměr "
             "bodů s vahami z matice členství umocněné na self.q."
@@ -150,6 +155,7 @@ class FuzzyCMeans(IterativeClustering):
         RuntimeError
             Pokud ``fit`` nebyl dosud volán.
         """
+        # assert: Ověřte, že fit() byl zavolán a self.assignment_ je 2D matice členství
         raise NotImplementedError(
             "Úkol: implementujte FuzzyCMeans.predict() — vraťte argmax "
             "matice členství self.assignment_ podél osy shluků (axis=1)."
