@@ -76,6 +76,7 @@ print(f"\nKonfigurace načtena: k-means k={km_cfg.k}, FCM k={fcm_cfg.k}, q={fcm_
 # ---------------------------------------------------------------------------
 try:
     rgb_data, dimensions = load_image("data/Bunky.png")
+    # rgb_data, dimensions = load_image("data/Bunky_real.png")
     print(f"Obrázek načten: {dimensions[0]}×{dimensions[1]} pixelů, "
           f"příznakový matice {rgb_data.shape}")
 except (OSError, ValueError) as e:
