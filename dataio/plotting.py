@@ -63,7 +63,9 @@ def plot_segmentation(
     plt.tight_layout()
     if save:
         _save_figure(title)
-    plt.show()
+    plt.show(
+        block=False
+    )
 
 
 def plot_silhouette(
@@ -120,7 +122,9 @@ def plot_silhouette(
     plt.tight_layout()
     if save:
         _save_figure(title)
-    plt.show()
+    plt.show(
+        block=False
+    )
 
 
 def plot_k_selection(
@@ -165,4 +169,6 @@ def plot_k_selection(
     plt.tight_layout()
     if save:
         _save_figure(title)
-    plt.show()
+    plt.show(
+        block=False
+    )

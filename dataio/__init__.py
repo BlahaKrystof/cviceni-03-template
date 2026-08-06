@@ -4,6 +4,7 @@ Balíček dataio - vstup/výstup a vizualizace pro Cvičení 03.
 Veřejné API:
     ExperimentConfig    - typovaná konfigurace experimentu
     CommonConfig        - společná nastavení (random_state, max_iter)
+    DataConfig          - nastavení vstupních dat (cesta k obrázku)
     KMeansConfig        - nastavení k-means (k, initializer)
     FuzzyCMeansConfig   - nastavení FCM (k, q, initializer)
     load_image          - načte PNG jako matici pixelů (n, 3)
@@ -22,6 +23,7 @@ from dataio.features import to_hsv, select_channels
 from dataio.config_manager import (
     ExperimentConfig,
     CommonConfig,
+    DataConfig,
     KMeansConfig,
     FuzzyCMeansConfig,
     load_config,
@@ -33,6 +35,7 @@ from dataio.plotting import plot_segmentation, plot_silhouette, plot_k_selection
 __all__ = [
     "ExperimentConfig",
     "CommonConfig",
+    "DataConfig",
     "KMeansConfig",
     "FuzzyCMeansConfig",
     "load_image",

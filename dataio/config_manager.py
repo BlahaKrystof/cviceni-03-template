@@ -23,6 +23,13 @@ class CommonConfig:
 
 
 @dataclass
+class DataConfig:
+    """Nastavení vstupních dat — cesta k segmentovanému snímku."""
+
+    image: str
+
+
+@dataclass
 class KMeansConfig:
     """Nastavení specifická pro algoritmus k-means."""
 
@@ -44,6 +51,7 @@ class ExperimentConfig:
     """Kompletní konfigurace experimentu načtená z YAML souboru."""
 
     common: CommonConfig
+    data: DataConfig
     kmeans: KMeansConfig
     fuzzy_cmeans: FuzzyCMeansConfig
 
@@ -54,6 +62,10 @@ def load_config(filepath: str = "config.yaml") -> ExperimentConfig:
     Vrací typovanou instanci ``ExperimentConfig`` — přístup přes atributy
     (``cfg.kmeans.k``) místo slovníkových klíčů (``cfg["kmeans"]["k"]``).
 
+    Před vrácením je konfigurace ověřena funkcí ``validate_config`` — při
+    neplatných hodnotách je vyvolána výjimka, takže volající vždy dostane
+    buď platnou konfiguraci, nebo srozumitelnou chybu.
+
     Parameters
     ----------
     filepath:
@@ -62,16 +74,19 @@ def load_config(filepath: str = "config.yaml") -> ExperimentConfig:
     Returns
     -------
     ExperimentConfig
-        Typovaná konfigurace experimentu.
+        Typovaná a ověřená konfigurace experimentu.
     """
     with open(filepath, "r", encoding="utf-8") as f:
         raw: dict = yaml.safe_load(f)
 
-    return ExperimentConfig(
+    cfg = ExperimentConfig(
         common=CommonConfig(**raw["common"]),
+        data=DataConfig(**raw["data"]),
         kmeans=KMeansConfig(**raw["kmeans"]),
         fuzzy_cmeans=FuzzyCMeansConfig(**raw["fuzzy_cmeans"]),
     )
+    validate_config(cfg)
+    return cfg
 
 
 def make_initializer(name: str, random_state: int | None = None) -> Initializer:
@@ -119,23 +134,35 @@ def make_initializer(name: str, random_state: int | None = None) -> Initializer:
 
 
 def validate_config(cfg: ExperimentConfig) -> None:
-    """Ověří základní platnost konfigurace a vyvolá výjimku při chybě.
+    """Ověří platnost konfigurace a vyvolá výjimku při chybné hodnotě.
 
-    Úkol (volitelný):
+    Úkol:
         Přidejte ověření, že konfigurace obsahuje požadované hodnoty
         ve správných rozsazích:
-        - ``k >= 2`` (shlukování s méně než dvěma shluky nedává smysl)
-        - ``q > 1``  (parametr fuzifikace musí být větší než 1)
-        - ``initializer`` je jedním z povolených názvů
+        - ``cfg.kmeans.k >= 2`` a ``cfg.fuzzy_cmeans.k >= 2``
+          (shlukování s méně než dvěma shluky nedává smysl)
+        - ``cfg.fuzzy_cmeans.q > 1``  (parametr fuzifikace musí být větší než 1)
+        - ``cfg.kmeans.initializer`` i ``cfg.fuzzy_cmeans.initializer`` jsou
+          jedním z povolených názvů (``random_uniform``, ``forgy``, ``kmeans++``)
 
         Používejte ``assert`` nebo ``ValueError`` pro srozumitelné chybové zprávy.
+
+        Tato funkce je volána z ``load_config`` — každé načtení konfigurace
+        tak projde ověřením a pipeline se nikdy nespustí s neplatným vstupem.
+        Jde o běžný obranný vzor: chráníte i uživatele, kteří nejsou při
+        zadávání důslední.
 
     Parameters
     ----------
     cfg:
-        Typovaná konfigurace načtená funkcí ``load_config``.
+        Typovaná konfigurace sestavená funkcí ``load_config``.
+
+    Raises
+    ------
+    ValueError
+        Pokud kterákoli hodnota v konfiguraci nesplňuje uvedené podmínky.
     """
     raise NotImplementedError(
-        "Úkol (volitelný): implementujte validate_config — ověřte platnost "
-        "konfigurace (k >= 2, q > 1, platný název inicializátoru)."
+        "Úkol: implementujte validate_config — ověřte platnost konfigurace "
+        "(k >= 2, q > 1, platný název inicializátoru)."
     )

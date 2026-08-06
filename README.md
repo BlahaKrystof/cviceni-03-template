@@ -94,7 +94,7 @@ pip install -r requirements.txt
 python cviceni_03.py
 ```
 
-Dokud nejsou implementovány všechny metody, pipeline vypíše `[NEDOKONCENO] název_metody` a přeskočí příslušné kroky. Toto chování je záměrné — pipeline lze spouštět průběžně i s částečnou implementací.
+Dokud nejsou implementovány všechny metody, pipeline vypíše `[NEDOKONCENO] název_metody` a přeskočí příslušné kroky. Toto chování je záměrné — pipeline lze spouštět průběžně i s částečnou implementací. Jedinou výjimkou je načtení konfigurace: protože `load_config` volá `validate_config`, je potřeba tuto validaci dokončit jako první — jinak se pipeline korektně ukončí hned na začátku. Jednotlivé algoritmy lze mezitím ověřovat přes `pytest`.
 
 ---
 
@@ -276,6 +276,10 @@ common:
   random_state: 42       # zárodek generátoru pro reprodukovatelnost
   max_iter: 100          # maximální počet iterací obou algoritmů
 
+data:
+  image: data/Bunky.png        # vstupní snímek k segmentaci
+  # image: data/Bunky_real.png # alternativní snímek — přepnete odkomentováním
+
 kmeans:
   k: 4
   initializer: kmeans++  # možnosti: random_uniform | forgy | kmeans++
@@ -285,6 +289,9 @@ fuzzy_cmeans:
   q: 2.0                 # parametr fuzifikace (pouze FCM), musí být > 1
   initializer: random_uniform
 ```
+
+Vstupní snímek je řízen sekcí `data` — přepnutí na jiný obrázek je jen úprava
+konfigurace, ne kódu. Druhá cesta je připravená jako zakomentovaný řádek.
 
 Parametry lze volně měnit bez úpravy kódu. Pokud chcete otestovat jiný počet shluků nebo inicializaci, stačí upravit `config.yaml` a znovu spustit `cviceni_03.py`.
 
@@ -304,6 +311,8 @@ ExperimentConfig
     ├── common: CommonConfig
     │       ├── random_state: int
     │       └── max_iter: int
+    ├── data: DataConfig
+    │       └── image: str
     ├── kmeans: KMeansConfig
     │       ├── k: int
     │       └── initializer: str
@@ -557,7 +566,7 @@ Tovární funkce: převede řetězcový název strategie na instanci `Initialize
 
 Tato funkce je volána automaticky v `cviceni_03.py` — po implementaci přestane pipeline při spuštění padat na `NotImplementedError`.
 
-#### `validate_config(cfg)` *(volitelné)*
+#### `validate_config(cfg)`
 
 Ověřte platnost hodnot v konfiguraci:
 
@@ -569,6 +578,15 @@ Ověřte platnost hodnot v konfiguraci:
 # Ověřte, že cfg.fuzzy_cmeans.initializer je jedním z povolených názvů
 # Pokud cokoliv nevyhoví: vyvolejte ValueError se srozumitelnou zprávou
 ```
+
+Tato funkce je volána přímo z `load_config` — každé načtení konfigurace tak
+projde ověřením a pipeline se nikdy nespustí s neplatným vstupem. Jde o běžný
+**obranný vzor**: chráníte i uživatele, kteří nejsou při zadávání důslední.
+
+> Protože `load_config` na `validate_config` závisí, je to jeden z prvních
+> úkolů, které je třeba dokončit — dokud není hotový, `cviceni_03.py` se
+> korektně ukončí hláškou `[NEDOKONCENO] load_config / validate_config`.
+> Testy ostatních komponent (`pytest`) na něm nezávisí a lze je řešit odděleně.
 
 ---
 
@@ -604,10 +622,12 @@ Testy jsou rozděleny do tříd podle implementované komponenty:
 | Třída testů | Co testuje |
 |:---|:---|
 | `TestInitializers` | Tvar těžišť, rozsah hodnot, reprodukovatelnost seedu, Forgy vybírá body z datasetu |
+| `TestBase` | `_distances_to_centroids`: obdélníkový tvar $(n, k)$ a hodnoty; `_has_converged`: prahy |
 | `TestKMeans` | Tvar výstupu `predict`, správné rozpoznání tří shluků, chyba bez `fit`, rozsah popisků |
 | `TestFuzzyCMeans` | Tvar matice členství, součet členství = 1, tvrdé popisky z `predict`, konvergence |
-| `TestBase` | `_distances_to_centroids`: tvar, symetrie, nulová diagonála; `_has_converged`: prahy |
 | `TestSilhouette` | Rozsah hodnot $[-1, 1]$, perfektní shluky mají skóre blízké 1, průměr |
+| `TestMakeInitializer` | Továrna vrací správný typ pro každý název, neznámý název vyvolá výjimku |
+| `TestConfig` | `validate_config`: platná konfigurace projde, chybné `k`, `q` a název inicializátoru jsou odmítnuty |
 
 Testy používají syntetická data — tři zjevně oddělené shluky, kde správná implementace musí fungovat bez ohledu na inicializaci. Nedeterminismus je ošetřen pevným zárodkem a tolerancí pro permutace popisků (různé číslování shluků je správná odpověď, ne chyba).
 

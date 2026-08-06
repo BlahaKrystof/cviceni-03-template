@@ -13,9 +13,24 @@ ještě nepřepsal Distance z Cvičení 01. Odděluje testy od brány cv1.
 """
 
 from __future__ import annotations
-
+from itertools import permutations
 import numpy as np
 import pytest
+from dataio.config_manager import (
+    make_initializer,
+    validate_config,
+    ExperimentConfig,
+    CommonConfig,
+    DataConfig,
+    KMeansConfig,
+    FuzzyCMeansConfig,
+)
+from src.initialization import Initializer
+from src.base import IterativeClustering
+from src.kmeans import KMeans
+from src.initialization import RandomUniformInit, ForgyInit, KMeansPlusPlusInit
+from src.fuzzy_cmeans import FuzzyCMeans
+from src.silhouette import silhouette_samples, silhouette_score
 
 # ---------------------------------------------------------------------------
 # Pomocná euklidovská vzdálenost — nezávislá na studentově Distance
@@ -63,7 +78,6 @@ def _align_labels(pred: np.ndarray, true: np.ndarray, k: int) -> np.ndarray:
     K-means může přiřadit jiná čísla shlukům než ``true_labels`` — permutace
     je správná odpověď, ne chyba.
     """
-    from itertools import permutations
 
     best_acc = -1
     best_perm = list(range(k))
@@ -79,9 +93,6 @@ def _align_labels(pred: np.ndarray, true: np.ndarray, k: int) -> np.ndarray:
 # ---------------------------------------------------------------------------
 # Inicializace
 # ---------------------------------------------------------------------------
-
-from src.initialization import RandomUniformInit, ForgyInit, KMeansPlusPlusInit
-
 
 class TestInitializers:
     """Testy inicializačních strategií."""
@@ -138,8 +149,6 @@ class TestInitializers:
 # K-means
 # ---------------------------------------------------------------------------
 
-from src.kmeans import KMeans
-
 
 class TestKMeans:
     """Testy k-means shlukování."""
@@ -156,11 +165,11 @@ class TestKMeans:
 
     def test_fit_recovers_clusters(self) -> None:
         """K-means správně rozezná tři zjevně oddělené shluky."""
-        X, true = make_three_clusters()
+        x, true = make_three_clusters()
         dist = DummyDistance()
         init = ForgyInit(random_state=42)
         km = KMeans(k=3, distance=dist, initializer=init, max_iter=200)
-        km.fit(X)
+        km.fit(x)
         pred = km.predict()
         aligned = _align_labels(pred, true, k=3)
         accuracy = (aligned == true).mean()
@@ -190,8 +199,6 @@ class TestKMeans:
 # ---------------------------------------------------------------------------
 # Fuzzy c-means
 # ---------------------------------------------------------------------------
-
-from src.fuzzy_cmeans import FuzzyCMeans
 
 
 class TestFuzzyCMeans:
@@ -249,10 +256,74 @@ class TestFuzzyCMeans:
 
 
 # ---------------------------------------------------------------------------
-# Silhoueta
+# Bázová třída (Template Method)
 # ---------------------------------------------------------------------------
 
-from src.silhouette import silhouette_samples, silhouette_score
+
+class _ConcreteClustering(IterativeClustering):
+    """Minimální konkrétní podtřída pro izolované testy bázových metod.
+
+    Abstraktní metody implementuje triviálně — testujeme pouze sdílené
+    metody ``_distances_to_centroids`` a ``_has_converged``, nezávisle
+    na studentově implementaci k-means či FCM.
+    """
+
+    def _update_assignment(self, x: np.ndarray, centroids: np.ndarray) -> np.ndarray:
+        return np.zeros(x.shape[0], dtype=int)
+
+    def _update_centroids(self, x: np.ndarray, assignment: np.ndarray) -> np.ndarray:
+        return self.centroids_
+
+    def predict(self) -> np.ndarray:
+        return self.assignment_
+
+
+class TestBase:
+    """Testy sdílených metod bázové třídy IterativeClustering."""
+
+    @staticmethod
+    def _make(k: int = 2) -> _ConcreteClustering:
+        return _ConcreteClustering(
+            k=k,
+            distance=DummyDistance(),
+            initializer=RandomUniformInit(random_state=0),
+        )
+
+    def test_distances_shape_is_rectangular(self) -> None:
+        """_distances_to_centroids vrátí obdélníkovou matici (n_bodů, k)."""
+        model = self._make(k=2)
+        x = np.array([[0.0, 0.0], [1.0, 0.0], [0.0, 1.0], [2.0, 2.0]])
+        centroids = np.array([[0.0, 0.0], [5.0, 5.0]])
+        d = model._distances_to_centroids(x, centroids)
+        assert d.shape == (4, 2), "Matice vzdáleností musí mít tvar (n_bodů, k)"
+
+    def test_distances_values(self) -> None:
+        """Prvky matice odpovídají euklidovské vzdálenosti bod–těžiště."""
+        model = self._make(k=2)
+        x = np.array([[0.0, 0.0], [3.0, 4.0]])
+        centroids = np.array([[0.0, 0.0], [6.0, 8.0]])
+        d = model._distances_to_centroids(x, centroids)
+        expected = np.array([[0.0, 10.0], [5.0, 5.0]])
+        np.testing.assert_allclose(d, expected, atol=1e-6)
+
+    def test_has_converged_true_when_identical(self) -> None:
+        """Nulový posun těžišť → konvergence (pravdivá hodnota)."""
+        model = self._make(k=2)
+        centroids = np.array([[0.0, 0.0], [5.0, 5.0]])
+        # truthy test (ne `is True`) — implementace smí vrátit i numpy.bool_
+        assert model._has_converged(centroids, centroids.copy())
+
+    def test_has_converged_false_when_shifted(self) -> None:
+        """Posun těžišť nad práh ε → nekonvergováno (nepravdivá hodnota)."""
+        model = self._make(k=2)
+        old = np.array([[0.0, 0.0], [5.0, 5.0]])
+        new = np.array([[0.0, 0.0], [5.0, 6.0]])
+        assert not model._has_converged(old, new)
+
+
+# ---------------------------------------------------------------------------
+# Silhoueta
+# ---------------------------------------------------------------------------
 
 
 class TestSilhouette:
@@ -310,10 +381,6 @@ class TestSilhouette:
 # Továrna inicializátorů
 # ---------------------------------------------------------------------------
 
-from dataio.config_manager import make_initializer
-from src.initialization import Initializer
-
-
 class TestMakeInitializer:
     """Testy továrny make_initializer."""
 
@@ -337,3 +404,50 @@ class TestMakeInitializer:
         """Vrácená instance je podtřídou Initializer."""
         init = make_initializer("random_uniform", random_state=42)
         assert isinstance(init, Initializer)
+
+
+# ---------------------------------------------------------------------------
+# Validace konfigurace
+# ---------------------------------------------------------------------------
+
+def _make_cfg(
+    k_km: int = 4,
+    k_fcm: int = 4,
+    q: float = 2.0,
+    init_km: str = "kmeans++",
+    init_fcm: str = "random_uniform",
+) -> ExperimentConfig:
+    """Sestaví validní konfiguraci, kterou jednotlivé testy záměrně rozbíjejí."""
+    return ExperimentConfig(
+        common=CommonConfig(random_state=42, max_iter=100),
+        data=DataConfig(image="data/Bunky.png"),
+        kmeans=KMeansConfig(k=k_km, initializer=init_km),
+        fuzzy_cmeans=FuzzyCMeansConfig(k=k_fcm, q=q, initializer=init_fcm),
+    )
+
+
+class TestConfig:
+    """Testy validace konfigurace (validate_config)."""
+
+    def test_valid_config_passes(self) -> None:
+        """Platná konfigurace projde bez výjimky."""
+        validate_config(_make_cfg())  # nesmí nic vyhodit
+
+    def test_k_below_two_raises(self) -> None:
+        """k < 2 je neplatné pro k-means i FCM."""
+        with pytest.raises((ValueError, AssertionError)):
+            validate_config(_make_cfg(k_km=1))
+        with pytest.raises((ValueError, AssertionError)):
+            validate_config(_make_cfg(k_fcm=1))
+
+    def test_q_not_above_one_raises(self) -> None:
+        """q <= 1 způsobuje dělení nulou ve vzorci FCM → neplatné."""
+        with pytest.raises((ValueError, AssertionError)):
+            validate_config(_make_cfg(q=1.0))
+
+    def test_unknown_initializer_raises(self) -> None:
+        """Neznámý název inicializátoru je odmítnut."""
+        with pytest.raises((ValueError, AssertionError)):
+            validate_config(_make_cfg(init_km="neexistuje"))
+        with pytest.raises((ValueError, AssertionError)):
+            validate_config(_make_cfg(init_fcm="neexistuje"))

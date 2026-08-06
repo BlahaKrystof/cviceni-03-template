@@ -64,7 +64,17 @@ print("=" * 60)
 # ---------------------------------------------------------------------------
 # 1. Konfigurace
 # ---------------------------------------------------------------------------
-cfg = load_config("config.yaml")
+# load_config volá validate_config — dokud není ověření implementováno,
+# nelze načíst konfiguraci a pipeline se korektně ukončí.
+try:
+    cfg = load_config("config.yaml")
+except NotImplementedError as e:
+    _ni("load_config / validate_config", e)
+    sys.exit(0)
+except (ValueError, AssertionError) as e:
+    print(f"Neplatná konfigurace: {e}")
+    sys.exit(1)
+
 common = cfg.common
 km_cfg = cfg.kmeans
 fcm_cfg = cfg.fuzzy_cmeans
@@ -74,9 +84,10 @@ print(f"\nKonfigurace načtena: k-means k={km_cfg.k}, FCM k={fcm_cfg.k}, q={fcm_
 # ---------------------------------------------------------------------------
 # 2. Načtení dat
 # ---------------------------------------------------------------------------
+# Cesta k obrázku je v config.yaml (sekce data) — přepnutí na jiný snímek
+# je otázkou úpravy konfigurace, ne kódu.
 try:
-    rgb_data, dimensions = load_image("data/Bunky.png")
-    # rgb_data, dimensions = load_image("data/Bunky_real.png")
+    rgb_data, dimensions = load_image(cfg.data.image)
     print(f"Obrázek načten: {dimensions[0]}×{dimensions[1]} pixelů, "
           f"příznakový matice {rgb_data.shape}")
 except (OSError, ValueError) as e:
@@ -146,7 +157,12 @@ if fcm_labels is not None:
     try:
         fcm_sil = silhouette_samples(rgb_data, fcm_labels, dist)
         print(f"  Průměrné silhouetové skóre: {fcm_sil.mean():.4f}")
-        plot_silhouette(fcm_sil, fcm_labels, title="Silhoueta — Fuzzy c-means")
+        plot_silhouette(
+            fcm_sil,
+            fcm_labels,
+            title="Silhoueta — Fuzzy c-means",
+            save=True,
+            )
     except NotImplementedError as e:
         _ni("silhouette_samples (FCM)", e)
 
@@ -217,7 +233,13 @@ try:
     )
     model.fit(hsv_data)
     hsv_labels = model.predict()
-    plot_segmentation(hsv_labels, dimensions, km_cfg.k, title="K-means v prostoru HSV")
+    plot_segmentation(
+        hsv_labels,
+        dimensions,
+        km_cfg.k,
+        title="K-means v prostoru HSV",
+        save=True,
+        )
     try:
         score = silhouette_score(hsv_data, hsv_labels, dist)
         print(f"  HSV prostor: silhouetové skóre = {score:.4f}")
@@ -254,7 +276,12 @@ for k_val in k_range:
         break
 
 if k_valid:
-    plot_k_selection(k_valid, k_scores)
+    plot_k_selection(
+        k_valid,
+        k_scores,
+        save=True,
+        title="Výběr optimálního počtu shluků k",
+        )
 
 print("\n" + "=" * 60)
 print("Pipeline dokončen.")
