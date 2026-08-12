@@ -82,7 +82,9 @@ class EuclideanDistance(Distance):
     @property
     def is_metric(self) -> bool:
         """Euklidovská vzdálenost je pravá metrika."""
-        return True
+        raise NotImplementedError(
+            "Úkol: implementujte EuclideanDistance.is_metric() — zkopírujte z Cvičení 01."
+        )
 
     def calculate(self, point_a: np.ndarray, point_b: np.ndarray) -> float:
         """Vypočítá euklidovskou vzdálenost mezi dvěma body.
@@ -115,7 +117,9 @@ class ManhattanDistance(Distance):
     @property
     def is_metric(self) -> bool:
         """Manhattanská vzdálenost je pravá metrika."""
-        return True
+        raise NotImplementedError(
+            "Úkol: implementujte ManhattanDistance.is_metric() — zkopírujte z Cvičení 01."
+        )
 
     def calculate(self, point_a: np.ndarray, point_b: np.ndarray) -> float:
         """Vypočítá manhattanskou vzdálenost mezi dvěma body.
@@ -148,7 +152,9 @@ class CosineCoeficient(Distance):
     @property
     def is_metric(self) -> bool:
         """Kosinová vzdálenost není pravá metrika (porušuje trojúhelníkovou nerovnost)."""
-        return False
+        raise NotImplementedError(
+            "Úkol: implementujte CosineCoeficient.is_metric() — zkopírujte z Cvičení 01."
+        )
 
     def calculate(self, point_a: np.ndarray, point_b: np.ndarray) -> float:
         """Vypočítá kosinovou vzdálenost mezi dvěma body.
