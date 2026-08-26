@@ -1,8 +1,24 @@
-"""
-Vizualizační funkce pro výsledky nehierarchického shlukování.
+# -*- coding: utf-8 -*-
 
-Tři tenké obálky — vykreslení je předpřipraveno, studenti se soustředí
-na samotný algoritmus a interpretaci výsledků.
+"""
+Created on 25. 08. 2026 at 20:59:30
+
+Author: Richard Redina
+Email: 195715@vut.cz
+Affiliation:
+         International Clinical Research Center, Brno
+         Brno University of Technology, Brno
+GitHub: RicRedi
+
+(._.)
+ <|>
+_/|_
+
+Description:
+    Vizualizační funkce pro výsledky nehierarchického shlukování.
+
+    Tři tenké obálky — vykreslení je předpřipraveno, studenti se soustředí
+    na samotný algoritmus a interpretaci výsledků.
 """
 
 import re

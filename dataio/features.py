@@ -1,8 +1,24 @@
-"""
-Předzpracování příznakových vektorů pixelů.
+# -*- coding: utf-8 -*-
 
-Konverze barevného prostoru a výběr kanálů pro experimenty
-s různými reprezentacemi vstupních dat.
+"""
+Created on 25. 08. 2026 at 20:59:30
+
+Author: Richard Redina
+Email: 195715@vut.cz
+Affiliation:
+         International Clinical Research Center, Brno
+         Brno University of Technology, Brno
+GitHub: RicRedi
+
+(._.)
+ <|>
+_/|_
+
+Description:
+    Předzpracování příznakových vektorů pixelů.
+
+    Konverze barevného prostoru a výběr kanálů pro experimenty
+    s různými reprezentacemi vstupních dat.
 """
 
 import numpy as np

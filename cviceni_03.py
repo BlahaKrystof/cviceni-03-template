@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Created on 25. 06. 2026
+Created on 25. 08. 2026 at 20:59:30
 
 Author: Richard Redina
 Email: 195715@vut.cz

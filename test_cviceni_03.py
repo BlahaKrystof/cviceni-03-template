@@ -1,15 +1,31 @@
+# -*- coding: utf-8 -*-
+
 """
-Smoke testy pro Cvičení 03 — nehierarchické shlukování.
+Created on 25. 08. 2026 at 20:59:30
 
-Testy jsou záměrně jednoduché: tři dobře oddělené syntetické shluky,
-kde správná implementace musí fungovat bez ohledu na inicializaci.
+Author: Richard Redina
+Email: 195715@vut.cz
+Affiliation:
+         International Clinical Research Center, Brno
+         Brno University of Technology, Brno
+GitHub: RicRedi
 
-Nedeterminismus je ošetřen:
-- k-means je testován s pevným zárodkem a tolerancí pro permutace popisků,
-- FCM je testován pouze strukturálně (součet členství = 1).
+(._.)
+ <|>
+_/|_
 
-DummyDistance: vlastní euklidovská implementace pro případ, že student
-ještě nepřepsal Distance z Cvičení 01. Odděluje testy od brány cv1.
+Description:
+    Smoke testy pro Cvičení 03 — nehierarchické shlukování.
+
+    Testy jsou záměrně jednoduché: tři dobře oddělené syntetické shluky,
+    kde správná implementace musí fungovat bez ohledu na inicializaci.
+
+    Nedeterminismus je ošetřen:
+    - k-means je testován s pevným zárodkem a tolerancí pro permutace popisků,
+    - FCM je testován pouze strukturálně (součet členství = 1).
+
+    DummyDistance: vlastní euklidovská implementace pro případ, že student
+    ještě nepřepsal Distance z Cvičení 01. Odděluje testy od brány cv1.
 """
 
 from __future__ import annotations

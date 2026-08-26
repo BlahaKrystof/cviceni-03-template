@@ -1,9 +1,25 @@
-"""
-Inicializační strategie pro nehierarchické shlukování.
+# -*- coding: utf-8 -*-
 
-Vzorový příklad (``RandomUniformInit``) ukazuje, jak subclassa používá
-``self._rng``. Studenti implementují ``ForgyInit`` a ``KMeansPlusPlusInit``
-ve stejném stylu.
+"""
+Created on 25. 08. 2026 at 20:59:30
+
+Author: Richard Redina
+Email: 195715@vut.cz
+Affiliation:
+         International Clinical Research Center, Brno
+         Brno University of Technology, Brno
+GitHub: RicRedi
+
+(._.)
+ <|>
+_/|_
+
+Description:
+    Inicializační strategie pro nehierarchické shlukování.
+
+    Vzorový příklad (``RandomUniformInit``) ukazuje, jak subclassa používá
+    ``self._rng``. Studenti implementují ``ForgyInit`` a ``KMeansPlusPlusInit``
+    ve stejném stylu.
 """
 
 from __future__ import annotations

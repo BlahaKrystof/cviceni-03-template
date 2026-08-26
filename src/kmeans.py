@@ -1,7 +1,23 @@
-"""
-Algoritmus k-means jako podtřída IterativeClustering.
+# -*- coding: utf-8 -*-
 
-Tři krátké přepisy variačních bodů — iterační smyčka zůstává v základní třídě.
+"""
+Created on 25. 08. 2026 at 20:59:30
+
+Author: Richard Redina
+Email: 195715@vut.cz
+Affiliation:
+         International Clinical Research Center, Brno
+         Brno University of Technology, Brno
+GitHub: RicRedi
+
+(._.)
+ <|>
+_/|_
+
+Description:
+    Algoritmus k-means jako podtřída IterativeClustering.
+
+    Tři krátké přepisy variačních bodů — iterační smyčka zůstává v základní třídě.
 """
 
 from __future__ import annotations

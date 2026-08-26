@@ -1,9 +1,25 @@
-"""
-Abstraktní třída vzdálenosti a její konkrétní implementace.
+# -*- coding: utf-8 -*-
 
-Zkopírujte sem své řešení z Cvičení 01 — bez funkční metody ``calculate()``
-se shlukování nerozjede. Toto je záměrná kontinuita: stejná třída ``Distance``
-propojuje Cvičení 01, 02 a 03.
+"""
+Created on 25. 08. 2026 at 20:59:30
+
+Author: Richard Redina
+Email: 195715@vut.cz
+Affiliation:
+         International Clinical Research Center, Brno
+         Brno University of Technology, Brno
+GitHub: RicRedi
+
+(._.)
+ <|>
+_/|_
+
+Description:
+    Abstraktní třída vzdálenosti a její konkrétní implementace.
+
+    Zkopírujte sem své řešení z Cvičení 01 — bez funkční metody ``calculate()``
+    se shlukování nerozjede. Toto je záměrná kontinuita: stejná třída ``Distance``
+    propojuje Cvičení 01, 02 a 03.
 """
 
 from abc import ABC, abstractmethod

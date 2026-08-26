@@ -1,7 +1,23 @@
-"""
-Balíček dataio - vstup/výstup a vizualizace pro Cvičení 03.
+# -*- coding: utf-8 -*-
 
-Veřejné API:
+"""
+Created on 25. 08. 2026 at 20:59:30
+
+Author: Richard Redina
+Email: 195715@vut.cz
+Affiliation:
+         International Clinical Research Center, Brno
+         Brno University of Technology, Brno
+GitHub: RicRedi
+
+(._.)
+ <|>
+_/|_
+
+Description:
+    Balíček dataio - vstup/výstup a vizualizace pro Cvičení 03.
+
+    Veřejné API:
     ExperimentConfig    - typovaná konfigurace experimentu
     CommonConfig        - společná nastavení (random_state, max_iter)
     DataConfig          - nastavení vstupních dat (cesta k obrázku)

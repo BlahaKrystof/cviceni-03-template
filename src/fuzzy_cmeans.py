@@ -1,8 +1,24 @@
-"""
-Algoritmus fuzzy c-means jako podtřída IterativeClustering.
+# -*- coding: utf-8 -*-
 
-Klíčový rozdíl oproti k-means: bod patří do všech shluků zároveň s různou
-měrou členství. Parametr ``q`` řídí míru „rozmazání" hranic shluků.
+"""
+Created on 25. 08. 2026 at 20:59:30
+
+Author: Richard Redina
+Email: 195715@vut.cz
+Affiliation:
+         International Clinical Research Center, Brno
+         Brno University of Technology, Brno
+GitHub: RicRedi
+
+(._.)
+ <|>
+_/|_
+
+Description:
+    Algoritmus fuzzy c-means jako podtřída IterativeClustering.
+
+    Klíčový rozdíl oproti k-means: bod patří do všech shluků zároveň s různou
+    měrou členství. Parametr ``q`` řídí míru „rozmazání" hranic shluků.
 """
 
 from __future__ import annotations

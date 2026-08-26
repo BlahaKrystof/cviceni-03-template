@@ -1,8 +1,24 @@
-"""
-Načítání obrazových dat pro cvičení nehierarchického shlukování.
+# -*- coding: utf-8 -*-
 
-Každý pixel vstupního obrázku se stane jedním řádkem příznakové matice.
-Výsledná matice má tvar (počet_pixelů, 3), kde sloupce odpovídají kanálům R, G, B.
+"""
+Created on 25. 08. 2026 at 20:59:30
+
+Author: Richard Redina
+Email: 195715@vut.cz
+Affiliation:
+         International Clinical Research Center, Brno
+         Brno University of Technology, Brno
+GitHub: RicRedi
+
+(._.)
+ <|>
+_/|_
+
+Description:
+    Načítání obrazových dat pro cvičení nehierarchického shlukování.
+
+    Každý pixel vstupního obrázku se stane jedním řádkem příznakové matice.
+    Výsledná matice má tvar (počet_pixelů, 3), kde sloupce odpovídají kanálům R, G, B.
 """
 
 import numpy as np

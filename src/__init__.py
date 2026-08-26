@@ -1,7 +1,23 @@
-"""
-Balíček src - algoritmy nehierarchického shlukování pro Cvičení 03.
+# -*- coding: utf-8 -*-
 
-Veřejné API:
+"""
+Created on 25. 08. 2026 at 20:59:30
+
+Author: Richard Redina
+Email: 195715@vut.cz
+Affiliation:
+         International Clinical Research Center, Brno
+         Brno University of Technology, Brno
+GitHub: RicRedi
+
+(._.)
+ <|>
+_/|_
+
+Description:
+    Balíček src - algoritmy nehierarchického shlukování pro Cvičení 03.
+
+    Veřejné API:
     Distance            - abstraktní základ pro metriky vzdálenosti
     EuclideanDistance   - euklidovská metrika
     ManhattanDistance   - manhattanská metrika

@@ -1,8 +1,24 @@
-"""
-Silhouetová analýza kvality shlukování.
+# -*- coding: utf-8 -*-
 
-Měří, jak dobře každý bod zapadá do svého shluku v porovnání s nejbližším
-sousedním shlukem. Pracuje s tvrdými popisky — kompatibilní s k-means i FCM.
+"""
+Created on 25. 08. 2026 at 20:59:30
+
+Author: Richard Redina
+Email: 195715@vut.cz
+Affiliation:
+         International Clinical Research Center, Brno
+         Brno University of Technology, Brno
+GitHub: RicRedi
+
+(._.)
+ <|>
+_/|_
+
+Description:
+    Silhouetová analýza kvality shlukování.
+
+    Měří, jak dobře každý bod zapadá do svého shluku v porovnání s nejbližším
+    sousedním shlukem. Pracuje s tvrdými popisky — kompatibilní s k-means i FCM.
 """
 
 from __future__ import annotations

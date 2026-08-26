@@ -1,8 +1,24 @@
-"""
-Správa konfigurace experimentů ze souboru YAML a továrna inicializátorů.
+# -*- coding: utf-8 -*-
 
-Konfigurace je načtena do typovaných dataclass instancí — překlep v názvu
-atributu odhalí editor okamžitě, ne až za běhu.
+"""
+Created on 25. 08. 2026 at 20:59:30
+
+Author: Richard Redina
+Email: 195715@vut.cz
+Affiliation:
+         International Clinical Research Center, Brno
+         Brno University of Technology, Brno
+GitHub: RicRedi
+
+(._.)
+ <|>
+_/|_
+
+Description:
+    Správa konfigurace experimentů ze souboru YAML a továrna inicializátorů.
+
+    Konfigurace je načtena do typovaných dataclass instancí — překlep v názvu
+    atributu odhalí editor okamžitě, ne až za běhu.
 """
 
 from __future__ import annotations

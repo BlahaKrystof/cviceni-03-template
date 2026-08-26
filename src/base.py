@@ -1,8 +1,24 @@
-"""
-Abstraktní základ pro iterativní nehierarchické shlukování.
+# -*- coding: utf-8 -*-
 
-Implementuje šablonovou metodu (Template Method): iterační smyčka je sdílená,
-dva variační body (přiřazení a přepočet těžišť) implementují podtřídy.
+"""
+Created on 25. 08. 2026 at 20:59:30
+
+Author: Richard Redina
+Email: 195715@vut.cz
+Affiliation:
+         International Clinical Research Center, Brno
+         Brno University of Technology, Brno
+GitHub: RicRedi
+
+(._.)
+ <|>
+_/|_
+
+Description:
+    Abstraktní základ pro iterativní nehierarchické shlukování.
+
+    Implementuje šablonovou metodu (Template Method): iterační smyčka je sdílená,
+    dva variační body (přiřazení a přepočet těžišť) implementují podtřídy.
 """
 
 from __future__ import annotations
