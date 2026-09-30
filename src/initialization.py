@@ -77,7 +77,7 @@ class Initializer(ABC):
         Parameters
         ----------
         x:
-            Příznakový matice tvaru ``(n_bodů, n_příznaků)``.
+            Příznaková matice tvaru ``(n_bodů, n_příznaků)``.
         k:
             Požadovaný počet shluků.
 
@@ -113,6 +113,20 @@ class RandomUniformInit(Initializer):
             Těžiště tvaru ``(k, n_příznaků)`` — hodnoty v rozsahu sloupců ``x``.
         """
         # assert: Ověřte, že x je 2D matice, k >= 2 a k nepřekračuje počet bodů
+        assert isinstance(x, np.ndarray), "Vstupní data musí být typu numpy.ndarray"
+        assert x.ndim == 2, "Matice musí být 2D"
+        assert k >= 2 and k <= x.shape[0], "Počet shluků musí být >=2 a <= počtu bodů"
+
+        output = np.zeros((k, x.shape[1]), dtype=x.dtype)
+        for i, column in enumerate(x.T):
+            minimum = min(column)
+            maximum = max(column)
+            centroid_coord = self._rng.uniform(low=minimum, high=maximum, size=k)
+            output[:, i] = centroid_coord
+
+
+        return output
+
         raise NotImplementedError(
             "Úkol: implementujte RandomUniformInit.initialize() \
             vygenerujte k těžišť náhodně z rovnoměrného rozdělení v rozsahu dat."
@@ -147,7 +161,18 @@ class ForgyInit(Initializer):
             Těžiště tvaru ``(k, n_příznaků)`` — podmnožina řádků ``x``.
         """
         # assert: Ověřte, že x je 2D matice, k >= 2 a k nepřekračuje počet bodů
+        assert isinstance(x, np.ndarray), "Vstupní data musí být typu numpy.ndarray"
+        assert x.ndim == 2, "Matice musí být 2D"
+        assert k >= 2 and k <= x.shape[0], "Počet shluků musí být >=2 a <= počtu bodů"
+
         # (nelze vybrat více různých bodů než jich existuje)
+
+        indices = self._rng.choice(x, size = k, replace = False)
+
+        centroids = x[indices].copy()
+
+        return centroids
+
         raise NotImplementedError(
             "Úkol: implementujte ForgyInit.initialize() — vyberte k různých "
             "existujících bodů z x jako počáteční těžiště."

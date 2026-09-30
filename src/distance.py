@@ -98,6 +98,8 @@ class EuclideanDistance(Distance):
     @property
     def is_metric(self) -> bool:
         """Euklidovská vzdálenost je pravá metrika."""
+        return True
+
         raise NotImplementedError(
             "Úkol: implementujte EuclideanDistance.is_metric() — zkopírujte z Cvičení 01."
         )
@@ -121,7 +123,12 @@ class EuclideanDistance(Distance):
         float
             Euklidovská vzdálenost.
         """
+        assert point_a.shape[0] == point_b.shape[0], "Vstup musí být 1D vektory stejné délky"
         # assert: Ověřte, že oba vstupy jsou 1D vektory stejné délky
+
+        dist = np.sqrt(np.sum(np.square(point_a - point_b)))
+        return dist
+
         raise NotImplementedError(
             "Úkol: implementujte EuclideanDistance.calculate() — zkopírujte z Cvičení 01."
         )
@@ -133,6 +140,8 @@ class ManhattanDistance(Distance):
     @property
     def is_metric(self) -> bool:
         """Manhattanská vzdálenost je pravá metrika."""
+
+        return True
         raise NotImplementedError(
             "Úkol: implementujte ManhattanDistance.is_metric() — zkopírujte z Cvičení 01."
         )
@@ -157,6 +166,11 @@ class ManhattanDistance(Distance):
             Manhattanská vzdálenost.
         """
         # assert: Ověřte, že oba vstupy jsou 1D vektory stejné délky
+        assert point_a.shape[0] == point_b.shape[0], "Vstup musí být 1D vektory stejné délky"
+
+        dist = np.sum(np.abs(point_a - point_b))
+        return dist
+
         raise NotImplementedError(
             "Úkol: implementujte ManhattanDistance.calculate() — zkopírujte z Cvičení 01."
         )
@@ -168,6 +182,8 @@ class CosineCoeficient(Distance):
     @property
     def is_metric(self) -> bool:
         """Kosinová vzdálenost není pravá metrika (porušuje trojúhelníkovou nerovnost)."""
+
+        return False
         raise NotImplementedError(
             "Úkol: implementujte CosineCoeficient.is_metric() — zkopírujte z Cvičení 01."
         )
@@ -193,6 +209,18 @@ class CosineCoeficient(Distance):
             Kosinová vzdálenost v rozsahu [0, 2].
         """
         # assert: Ověřte, že oba vstupy jsou 1D vektory stejné délky
+
+        assert point_a.shape[0] == point_b.shape[0], "Vstup musí být 1D vektory stejné délky"
+
+        norm_a = np.linalg.norm(point_a)
+        norm_b = np.linalg.norm(point_b)
+
+        if norm_a == 0.0 or norm_b == 0.0:
+            return 0.0
+
+        cos_theta = np.dot(point_a, point_b) / (norm_a * norm_b)
+
+        return cos_theta
         raise NotImplementedError(
             "Úkol: implementujte CosineCoeficient.calculate() — zkopírujte z Cvičení 01."
         )

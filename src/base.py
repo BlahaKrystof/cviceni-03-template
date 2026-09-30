@@ -109,6 +109,21 @@ class IterativeClustering(ABC):
         """
         # assert: Ověřte, že x a centroids jsou 2D matice se stejným počtem příznaků
         # a centroids má self.k řádků
+        assert x.shape[1] == centroids.shape[1], "Matice musí mít stejný počet příznaků"
+        assert x.ndim == 2 and centroids.ndim == 2, "Obě matice musí být 2D"
+        assert centroids.shape[0] == self.k, "Matice centroids musí mít k řádků"
+
+        n_points = x.shape[0]
+        distance_matrix = np.zeros((n_points, self.k))
+
+        for i in range(n_points):
+            for j in range(self.k):
+                dist = self.distance.calculate(x[i], centroids[j])
+
+
+
+        return distance_matrix
+
         raise NotImplementedError(
             "Úkol: implementujte _distances_to_centroids() — vytvořte matici "
             "vzdáleností tvaru (n_bodů, k) voláním self.distance.calculate."
