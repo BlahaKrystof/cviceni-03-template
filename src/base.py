@@ -119,7 +119,7 @@ class IterativeClustering(ABC):
         for i in range(n_points):
             for j in range(self.k):
                 dist = self.distance.calculate(x[i], centroids[j])
-
+                distance_matrix[i, j] = dist
 
 
         return distance_matrix
@@ -161,6 +161,14 @@ class IterativeClustering(ABC):
             ``True`` pokud algoritmus konvergoval, jinak ``False``.
         """
         # assert: Ověřte, že obě matice těžišť mají stejný tvar
+        assert old_centroids.ndim == new_centroids.ndim, "Obě matice těžišť musí mít stejný tvar"
+
+        dif = np.linalg.norm(old_centroids - new_centroids)
+        if dif < self._EPSILON:
+            return True
+        else:
+            return False
+
         raise NotImplementedError(
             "Úkol: implementujte _has_converged() — porovnejte posun těžišť "
             "s prahem self._EPSILON pomocí np.linalg.norm."
@@ -214,6 +222,23 @@ class IterativeClustering(ABC):
             Instance ``self`` po natrénování (pro řetězení metod).
         """
         # assert: Ověřte, že x je 2D matice a obsahuje alespoň k bodů
+        assert x.ndim == 2, "Vstupní matice musí být 2D"
+        assert x.shape[0] >= self.k, "Matice musí obsahovat alespoň k bodů"
+
+
+        self.centroids_ = self.initializer.initialize(x, self.k)
+
+        for cycle in range(self.max_iter):
+            assignment = self._update_assignment(x, self.centroids_)
+            old = self.centroids_.copy()
+            new = self._update_centroids(x, assignment)
+            self.assignment_ = assignment
+            self.centroids_ = new
+            if self._has_converged(old, new):
+                return self
+
+
+        return self
         raise NotImplementedError(
             "Úkol: implementujte fit() — iterační smyčku inicializace → přiřazení "
             "→ přepočet těžišť → konvergence. Viz docstring pro pořadí kroků."

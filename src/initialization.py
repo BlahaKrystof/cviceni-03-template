@@ -217,6 +217,12 @@ class KMeansPlusPlusInit(Initializer):
             Těžiště tvaru ``(k, n_příznaků)`` vybraná algoritmem k-means++.
         """
         # assert: Ověřte, že x je 2D matice, k >= 2 a k nepřekračuje počet bodů
+        assert isinstance(x, np.ndarray), "Vstupní data musí být typu numpy.ndarray"
+        assert x.ndim == 2, "Matice musí být 2D"
+        assert k >= 2 and k <= x.shape[0], "Počet shluků musí být >=2 a <= počtu bodů"
+
+
+
         raise NotImplementedError(
             "Úkol: implementujte KMeansPlusPlusInit.initialize() — algoritmus k-means++. "
             "Viz docstring pro popis kroků algoritmu."
