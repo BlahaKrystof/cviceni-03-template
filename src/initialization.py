@@ -167,8 +167,12 @@ class ForgyInit(Initializer):
 
         # (nelze vybrat více různých bodů než jich existuje)
 
-        indices = self._rng.choice(x, size = k, replace = False)
+        n_samples = x.shape[0]
 
+        # 2. Vyberte k náhodných a RŮZNÝCH INDEXŮ z rozsahu 0 až n_samples - 1
+        indices = self._rng.choice(n_samples, size=k, replace=False)
+
+        # 3. Vyberte odpovídající řádky z matice x jako počáteční těžiště
         centroids = x[indices].copy()
 
         return centroids

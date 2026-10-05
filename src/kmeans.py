@@ -62,7 +62,8 @@ class KMeans(IterativeClustering):
         """
         # assert: Ověřte, že x a centroids jsou 2D matice se stejným počtem příznaků
         assert x.ndim == 2 and centroids.ndim == 2, "Matice x a matice centroids musí být 2D"
-        assert  x.shape[0] == centroids.shape[0], "Matice musí mít shodný počet příznaků"
+        assert x.shape[1] == centroids.shape[1], "Matice musí mít shodný počet příznaků"
+
 
         distance = self._distances_to_centroids(x, centroids)
 
