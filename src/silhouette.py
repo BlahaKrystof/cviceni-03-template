@@ -82,6 +82,44 @@ def silhouette_samples(
     """
     # assert: Ověřte, že x je 2D matice, labels je 1D pole stejné délky
     # a obsahuje alespoň 2 různé shluky
+    assert x.ndim == 2, "Vstupní matice x musí být 2D"
+    assert labels.ndim == 1, "Pole labels musí být 1D"
+    assert labels.shape[0] == x.shape[0], "Délka pole labels musí odpovídat počtu bodů v x"
+    assert np.unique(labels).size >= 2, "Pole labels musí obsahovat alespoň 2 různé shluky"
+
+    silhouette = np.zeros(x.shape[0], dtype=float)
+    unique_clusters = np.unique(labels)
+    for i in range(x.shape[0]):
+        c = labels[i]
+        cluster_indices = np.where(labels == c)[0]
+        if len(cluster_indices) == 1:
+            a_i = 0.0
+        else:
+            other_in_cluster = cluster_indices[cluster_indices != i]
+            distances_a = [distance.calculate(x[i], x[j]) for j in other_in_cluster]
+            a_i = np.mean(distances_a)
+
+        b_i = float('inf')
+        for other_c in unique_clusters:
+            if other_c == c:
+                continue
+            other_indices = np.where(labels == other_c)[0]
+            if len(other_indices) == 0:
+                continue
+            distances_b = [distance.calculate(x[i], x[j]) for j in other_indices]
+            mean_dist = np.mean(distances_b)
+            if mean_dist < b_i:
+                b_i = mean_dist
+
+        max_ab = max(a_i, b_i)
+        if max_ab == 0:
+            silhouette[i] = 0.0
+        else:
+            silhouette[i] = (b_i - a_i) / max_ab
+
+    return silhouette
+
+
     raise NotImplementedError(
         "Úkol: implementujte silhouette_samples() — vypočítejte silhouetovou "
         "hodnotu s(i) = (b(i) - a(i)) / max(a(i), b(i)) pro každý bod."
@@ -115,6 +153,8 @@ def silhouette_score(
         Průměrné silhouetové skóre v rozsahu [-1, 1].
         Blíže k 1 → kvalitnější shlukování.
     """
+
+    return np.mean(silhouette_samples(x, labels, distance))
     raise NotImplementedError(
         "Úkol: implementujte silhouette_score() — vraťte průměr "
         "výstupu silhouette_samples(X, labels, distance)."

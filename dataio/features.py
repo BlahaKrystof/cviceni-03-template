@@ -22,7 +22,7 @@ Description:
 """
 
 import numpy as np
-
+from matplotlib.colors import rgb_to_hsv
 
 def to_hsv(rgb_data: np.ndarray) -> np.ndarray:
     """Převede příznakovou matici z prostoru RGB do prostoru HSV.
@@ -48,10 +48,11 @@ def to_hsv(rgb_data: np.ndarray) -> np.ndarray:
     np.ndarray
         Příznakový matice ve formátu HSV, tvar ``(n_pixelů, 3)``.
     """
-    raise NotImplementedError(
-        "Úkol: implementujte to_hsv — převeďte příznakovou matici z RGB do HSV. "
-        "Nápověda: podívejte se na matplotlib.colors.rgb_to_hsv nebo colorsys."
-    )
+    assert rgb_data.ndim == 2, "Vstupní data musí být 2D matice"
+    assert rgb_data.shape[1] == 3, "Matice musí mít 3 sloupce pro kanály R, G, B"
+
+    # Použití knihovní funkce z matplotlib, která je plně vektorizovaná pro NumPy pole
+    return rgb_to_hsv(rgb_data)
 
 
 def select_channels(data: np.ndarray, channels: list[int]) -> np.ndarray:

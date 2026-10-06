@@ -225,9 +225,33 @@ class KMeansPlusPlusInit(Initializer):
         assert x.ndim == 2, "Matice musí být 2D"
         assert k >= 2 and k <= x.shape[0], "Počet shluků musí být >=2 a <= počtu bodů"
 
+        n_samples, n_features = x.shape
+        centroids = np.zeros((k, n_features))
 
+        # 1. Vyberte první těžiště náhodně (rovnoměrně) z bodů x
+        first_idx = self._rng.choice(n_samples)
+        centroids[0] = x[first_idx]
 
-        raise NotImplementedError(
-            "Úkol: implementujte KMeansPlusPlusInit.initialize() — algoritmus k-means++. "
-            "Viz docstring pro popis kroků algoritmu."
-        )
+        # Opakujte, dokud nemáme k těžišť
+        for i in range(1, k):
+            # 2. Pro každý bod vypočítejte čtvercovou vzdálenost k nejbližšímu dosud zvolenému těžišti: D(x)^2
+            # Spočítáme euklidovskou vzdálenost ke všem již zvoleným těžištím a umocníme na druhou
+            distances_sq = np.array([
+                np.linalg.norm(x - centroids[c], axis=1) ** 2
+                for c in range(i)
+            ])
+            # Pro každý bod vezmeme minimum přes všechna dosavadní těžiště
+            min_distances_sq = np.min(distances_sq, axis=0)
+
+            # 3. Vyberte další těžiště s pravděpodobností úměrnou D(x)^2
+            sum_dist = np.sum(min_distances_sq)
+            if sum_dist == 0:
+                # Ochrana proti nulovému součtu (např. pokud by body splývaly)
+                p = np.ones(n_samples) / n_samples
+            else:
+                p = min_distances_sq / sum_dist
+
+            next_idx = self._rng.choice(n_samples, p=p)
+            centroids[i] = x[next_idx]
+
+        return centroids
