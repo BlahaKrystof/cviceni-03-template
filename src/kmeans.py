@@ -116,10 +116,7 @@ class KMeans(IterativeClustering):
 
         return output
 
-        raise NotImplementedError(
-            "Úkol: implementujte KMeans._update_centroids() — průměr bodů "
-            "přiřazených ke každému shluku. Ošetřete prázdné shluky."
-        )
+
 
     def predict(self) -> np.ndarray:
         """Vrátí tvrdé popisky shluků uložené po volání ``fit``.
@@ -144,7 +141,4 @@ class KMeans(IterativeClustering):
 
         return self.assignment_
 
-        raise NotImplementedError(
-            "Úkol: implementujte KMeans.predict() — vraťte self.assignment_ "
-            "(tvrdé popisky uložené metodou fit)."
-        )
+

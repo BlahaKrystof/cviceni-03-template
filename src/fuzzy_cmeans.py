@@ -69,6 +69,8 @@ class FuzzyCMeans(IterativeClustering):
             Maximální počet iterací.
         """
         # assert: Ověřte, že parametr fuzifikace q je větší než 1
+        assert self.q > 1, "Parametr q musí být větší než 1"
+
         super().__init__(k, distance, initializer, max_iter)
         self.q: float = q
 
@@ -110,6 +112,20 @@ class FuzzyCMeans(IterativeClustering):
             Matice členství tvaru ``(n_bodů, k)``, každý řádek sumuje na 1.
         """
         # assert: Ověřte, že x a centroids jsou 2D matice se stejným počtem příznaků
+        assert x.ndim == 2 and centroids.ndim == 2, "Matice x a centroids musí být 2D"
+        assert x.shape[1] == centroids.shape[1], "Matice x a centroids musí mít stejný počet příznaků"
+
+        distances = self._distances_to_centroids(x, centroids)
+        U = np.zeros((x.shape[0], centroids.shape[0]))
+
+        for p in range(x):
+            for c in range(centroids):
+                if distances[p, c] == 0:
+                    U[p, c] = 1
+                else:
+                    for j in range
+
+
         raise NotImplementedError(
             "Úkol: implementujte FuzzyCMeans._update_assignment() — matici "
             "členství FCM. Viz docstring pro vzorec a ošetření dělení nulou."

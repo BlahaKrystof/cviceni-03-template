@@ -124,10 +124,7 @@ class IterativeClustering(ABC):
 
         return distance_matrix
 
-        raise NotImplementedError(
-            "Úkol: implementujte _distances_to_centroids() — vytvořte matici "
-            "vzdáleností tvaru (n_bodů, k) voláním self.distance.calculate."
-        )
+
 
     def _has_converged(
         self,
@@ -169,10 +166,7 @@ class IterativeClustering(ABC):
         else:
             return False
 
-        raise NotImplementedError(
-            "Úkol: implementujte _has_converged() — porovnejte posun těžišť "
-            "s prahem self._EPSILON pomocí np.linalg.norm."
-        )
+
 
     def fit(self, x: np.ndarray) -> IterativeClustering:
         """Natrénuje shlukování na datech iterativní optimalizací.
@@ -239,10 +233,7 @@ class IterativeClustering(ABC):
 
 
         return self
-        raise NotImplementedError(
-            "Úkol: implementujte fit() — iterační smyčku inicializace → přiřazení "
-            "→ přepočet těžišť → konvergence. Viz docstring pro pořadí kroků."
-        )
+
 
     @abstractmethod
     def _update_assignment(
